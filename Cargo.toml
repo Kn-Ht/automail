@@ -8,7 +8,11 @@ edition = "2021"
 [dependencies]
 anyhow = "1.0.79"
 colored = "2.1.0"
+cursive = {version = "0.20.0", default-features = false, features = ["crossterm-backend", "toml"]}
 inquire = "0.6.2"
 lettre = "0.11.4"
+msgbox = "0.7.0"
+platform-dirs = "0.3.0"
 rpassword = "7.3.1"
+serde = { version = "1.0.196", features = ["derive"] }
 toml = "0.8.10"

@@ -1,0 +1,17 @@
+shadow = false  # Don't draw shadows around stacked views
+borders = "simple"  # Draw simple borders around views
+
+[colors]
+    background = "#111111"  # Dark background color
+    shadow     = ["#111111", "#111111"]  # Dark shadow color
+    view       = "#333333"  # Darker view background color
+
+    primary   = ["#CCCCCC"]  # Light text color
+    secondary = "#999999"    # Dimmed text color
+    tertiary  = "#444444"    # Even dimmer text color
+
+    title_primary   = "#FF5555"  # Bright title text color
+    title_secondary = "#FFFF55"  # Brighter secondary title text color
+
+    highlight          = "#FF5555"  # Bright highlight color
+    highlight_inactive = "#5555FF"  # Dimmed highlight color

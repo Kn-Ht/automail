@@ -1,27 +1,27 @@
-use std::io::{self, Read, Write};
 
-use lettre::message::MessageBuilder;
-use lettre::transport::smtp::authentication::{Credentials, Mechanism};
-use lettre::{Message, SmtpTransport};
 use lettre::Transport;
+use platform_dirs::AppDirs;
+use std::{
+    fs,
+    io::{self, Read, Write},
+};
+
 mod relays;
 
 mod email;
-use email::Sender;
 use colored::Colorize;
+use email::Sender;
 
 mod config;
+use config::{Config, ConfigHandle};
 
-use crate::relays::Relay;
+use crate::{config::EXE_NAME, relays::Relay};
 
+mod ui;
+use ui::Ui;
+
+// Name of the project
 const DEBUG: bool = cfg!(debug_assertions);
-
-fn pause_and_quit(msg: &str, code: i32) -> ! {
-    print!("{}", msg.bold());
-    let _ = io::stdout().flush();
-    let _ = io::stdin().read(&mut [0u8]);
-    std::process::exit(code);
-}
 
 fn main_() -> anyhow::Result<()> {
     // 'Sender' stores information relating to the user.
@@ -30,10 +30,16 @@ fn main_() -> anyhow::Result<()> {
     } else {
         Sender::from_stdin()?
     };
-    
-    // Read receiver data
-    let receiver = inquire::Text::new("Enter the receiver's email").prompt()?;
 
+    // Config file
+    let mut config = ConfigHandle::open()?;
+
+    // UI
+    let mut ui = Ui::init(config)?;
+    ui.load_interface();
+    ui.run();
+
+    /*
     println!("----------------------------");
     println!("Sender: {}", sender.email().to_string().green());
 
@@ -53,15 +59,14 @@ fn main_() -> anyhow::Result<()> {
             eprintln!("Failed to send email: {}", e.to_string().red());
         }
     }
+    */
 
     Ok(())
 }
 
 fn main() {
-    let mut exit_code = 0;
     if let Err(e) = main_() {
         eprintln!("{}: {e}", "error".bright_red());
-        exit_code = 1;
+        let _ = msgbox::create(EXE_NAME, &format!("Error: {e}"), msgbox::IconType::Error);
     }
-    pause_and_quit("Press any key to exit . . .", exit_code);
 }
