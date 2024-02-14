@@ -1,17 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <link rel="stylesheet" href="styles.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Automail</title>
     <script type="module" src="/main.js" defer></script>
-    <style>
-    </style>
-  </head>
+    <script>
+        function numberInput(event) {
+            if (!parseInt(event.key) && event.key != 'Backspace') {
+                event.preventDefault();
+            }
+        }
+    </script>
+</head>
 
-  <body>
-    <div class="container">
-    </div>
-  </body>
+<body>
+    <table id="clients">
+        <tr id="table-header">
+            <th style="width: 2rem">enabled</th>
+            <th style="width:60%">address</th>
+            <th style="width:13%;">timeout<i>(s)</i></th>
+            <th style="width:5%;">email</th>
+            <th style="width:auto">status</th>
+        </tr>
+        <tr id="client-0">
+            <td><input id="chk-enabled" type="checkbox" checked></td>
+            <td><input id="url" type="url" value="google.com"></td>
+            <td><input id="timeout" type="number" min="0" value="60"></td>
+            <td><input id="chk-email" type="checkbox"></td>
+            <td><span id="status" style="color:rgb(0, 181, 0);">✔ Ok <i>(60s)</i></span></td>
+        </tr>
+    </table>
+</body>
+
 </html>
