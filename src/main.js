@@ -1,18 +1,23 @@
 const { invoke } = window.__TAURI__.tauri;
 
 var table;
+var smtpLogin;
 
 function tick() {
-    
+    console.log("tick");
 }
 
-function rowToggleDisabled(row) {
+function rowToggleEnabled(row, enable) {
     let email = row.querySelector("#chk-email");
-    if (row.classList.contains("disabled-row")) {
+    let timeout = row.querySelector("#timeout");
+
+    if (enable) {
         row.classList.remove("disabled-row");
+        timeout.disabled = null;
         email.disabled = null;
     } else {
         row.classList.add("disabled-row");
+        timeout.disabled = true;
         email.disabled = true;
     }
 }
@@ -21,16 +26,16 @@ function rowToggleDisabled(row) {
 
 function toggleClient(id, index) {
     let row = document.querySelector("#" + id);
-    let value = row.querySelector("#chk-enabled")
-    
-    rowToggleDisabled(row);
-
-    console.log(row, value.checked, row.getAttributeNames());
+    rowToggleEnabled(row, row.querySelector("#chk-enabled").checked);
 }
 
-function toggleEmail(id, index) {
+async function toggleEmail(id, index) {
     let value = document.querySelectorAll(`#${id}>#chk-email`).checked;
-    console.log(value);
+    if (value) {
+        if (!smtpLogin) {
+            // TODO: create window and ask for login details
+        }
+    }
 }
 
 function urlKeyDown(id, index) {
@@ -42,12 +47,12 @@ function urlKeyDown(id, index) {
 
     if (newValue.length === 0) {
         enabled.checked = false;
-        rowToggleDisabled(row);
+        rowToggleEnabled(row, false);
     }
 
     else if (!enabled.checked && (newValue && newValue.length > 0)) {
         enabled.checked = true;
-        row.classList.remove("disabled-row");
+        rowToggleEnabled(row, true);
         console.log(row);
     }
 }
@@ -57,7 +62,7 @@ function timeoutChanged(id, index) {
     let timeout = row.querySelector("#" + id + " #timeout");
     let value = timeout.value;
 
-    
+    // TODO
 }
 
 window.addEventListener("DOMContentLoaded", async () => {
@@ -68,6 +73,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     default_row.querySelector("#url").value = "";
     default_row.querySelector("#chk-enabled").checked = false;
     default_row.querySelector("#status").innerHTML = '<span id="status" style="color: gray">x</span>';
+    default_row.querySelector("#timeout").disabled = true;
     default_row.classList.add("disabled-row");
 
     const newRow = (index) => {
@@ -95,6 +101,7 @@ window.addEventListener("DOMContentLoaded", async () => {
         table.appendChild(row);
     }
 
-    let smtpLogin = await invoke("smtp_login", {});
-    console.log(smtpLogin);
+    smtpLogin = await invoke("smtp_login", {});
+
+    setInterval(tick, 1000);
 });
