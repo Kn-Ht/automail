@@ -1,2 +1,4 @@
 /target
 .xwin*
+.package-lock
+/node_modules

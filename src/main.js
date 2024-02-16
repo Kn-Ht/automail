@@ -1,10 +1,23 @@
 const { invoke } = window.__TAURI__.tauri;
 
+const dataStore = new Store(".settings.dat");
+
 var table;
 var smtpLogin;
 
+const saveData = async () => {
+    await invoke("save_state", {
+        
+    })
+};
+
 function tick() {
     console.log("tick");
+}
+
+/// Save user data to file
+function saveData() {
+
 }
 
 function rowToggleEnabled(row, enable) {
@@ -30,10 +43,13 @@ function toggleClient(id, index) {
 }
 
 async function toggleEmail(id, index) {
-    let value = document.querySelectorAll(`#${id}>#chk-email`).checked;
+    let row = document.querySelector("#" + id);
+    let value = row.querySelector("#chk-email").value;
+    console.log(value);
     if (value) {
         if (!smtpLogin) {
             // TODO: create window and ask for login details
+            await invoke("open_settings_window", {});
         }
     }
 }
@@ -102,6 +118,26 @@ window.addEventListener("DOMContentLoaded", async () => {
     }
 
     smtpLogin = await invoke("smtp_login", {});
+
+    const userData = await dataStore.get('userdata');
+
+    if (userData) {
+        smtpLogin = await invoke("make_user", {
+            username: userData.username,
+            password: userData.password
+        });
+
+        console.log(smtpLogin);
+    } else {
+        const user = await invoke("make_user", {username: "hello", password: "world!"});
+        console.log(user);
+
+        await dataStore.set('userdata', {
+            username: user.username,
+            password: user.password,
+            extra: user.nonce
+        })
+    }
 
     setInterval(tick, 1000);
 });

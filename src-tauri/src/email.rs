@@ -1,23 +1,11 @@
 use lazy_static::lazy_static;
-use serde::{Deserialize, Serialize};
+use std::sync::Mutex;
 
-#[derive(Serialize, Deserialize)]
-pub struct SmtpLogin {
-    pub username: String,
-    pub password: String,
-}
+use crate::storage::User;
 
-impl SmtpLogin {
-    pub fn new<S: ToString>(username: S, password: S) -> Self {
-        Self {
-            username: username.to_string(),
-            password: password.to_string()
-        }
-    }
-}
-
+#[derive(Clone)]
 pub struct Email {
-    smtp_login: Option<SmtpLogin>
+    smtp_login: Option<User>
 }
 
 impl Email {
@@ -29,14 +17,20 @@ impl Email {
 }
 
 lazy_static! {
-    static ref EMAIL: Email = Email::new();
+    static ref EMAIL: Mutex<Email> = Mutex::new(Email::new());
 }
 
 #[tauri::command(async)]
-pub fn smtp_login() -> &'static Option<SmtpLogin> {
-    &EMAIL.smtp_login
+pub fn smtp_login() -> Option<User> {
+    EMAIL.lock().unwrap().smtp_login.clone()
 }
 
+#[tauri::command(async)]
+pub fn smtp_set_login(to: User) {
+    let mut guard = EMAIL.lock().unwrap();
+    guard.smtp_login = Some(to);
+}
+ 
 #[tauri::command(async)]
 pub fn send_email(offline_addr: &str, timeout: u64) {
     todo!()

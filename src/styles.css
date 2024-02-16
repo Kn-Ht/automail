@@ -61,7 +61,7 @@ table {
     padding: 0;
 }
 
-table tr {
+table tr, #client-0 {
     background-color: #1a1a1a;
     height: 2rem;
 }
